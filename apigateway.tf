@@ -42,6 +42,10 @@ resource "aws_apigatewayv2_route" "lambda" {
   api_id    = aws_apigatewayv2_api.proxy.id
   route_key = each.key
   target    = "integrations/${aws_apigatewayv2_integration.lambda[each.key].id}"
+
+  # Apply JWT authorization unless route is in public_routes list
+  authorization_type = var.enable_jwt_authorizer && !contains(var.public_routes, each.key) ? "JWT" : "NONE"
+  authorizer_id      = var.enable_jwt_authorizer && !contains(var.public_routes, each.key) ? aws_apigatewayv2_authorizer.jwt[0].id : null
 }
 
 # =============================================================================
@@ -63,6 +67,10 @@ resource "aws_apigatewayv2_route" "http_proxy" {
   api_id    = aws_apigatewayv2_api.proxy.id
   route_key = "ANY /${each.value.path_prefix}/{proxy+}"
   target    = "integrations/${aws_apigatewayv2_integration.http_proxy[each.key].id}"
+
+  # HTTP proxy routes can also use JWT authorization
+  authorization_type = var.enable_jwt_authorizer ? "JWT" : "NONE"
+  authorizer_id      = var.enable_jwt_authorizer ? aws_apigatewayv2_authorizer.jwt[0].id : null
 }
 
 # =============================================================================

@@ -112,3 +112,17 @@ output "log_group_arn" {
   description = "ARN of the CloudWatch log group"
   value       = aws_cloudwatch_log_group.api_gateway.arn
 }
+
+# =============================================================================
+# Authorizer Outputs
+# =============================================================================
+
+output "authorizer_id" {
+  description = "ID of the JWT authorizer (null if not enabled)"
+  value       = var.enable_jwt_authorizer ? aws_apigatewayv2_authorizer.jwt[0].id : null
+}
+
+output "authorizer_name" {
+  description = "Name of the JWT authorizer (null if not enabled)"
+  value       = var.enable_jwt_authorizer ? aws_apigatewayv2_authorizer.jwt[0].name : null
+}

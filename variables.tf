@@ -236,6 +236,43 @@ variable "alarm_thresholds" {
 }
 
 # =============================================================================
+# JWT Authorizer (Auth0/OAuth2.0)
+# =============================================================================
+
+variable "enable_jwt_authorizer" {
+  description = "Enable JWT authorizer for protected routes"
+  type        = bool
+  default     = false
+}
+
+variable "jwt_issuer" {
+  description = "JWT issuer URL (e.g., https://your-tenant.auth0.com/)"
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.jwt_issuer == null || can(regex("^https://", var.jwt_issuer))
+    error_message = "JWT issuer must be a valid HTTPS URL."
+  }
+}
+
+variable "jwt_audience" {
+  description = "List of JWT audiences (API identifiers in Auth0)"
+  type        = list(string)
+  default     = []
+}
+
+variable "public_routes" {
+  description = <<-EOT
+    List of route keys that should NOT require authorization.
+    These routes will be publicly accessible without a JWT token.
+    Example: ["GET /health", "GET /public/status"]
+  EOT
+  type        = list(string)
+  default     = []
+}
+
+# =============================================================================
 # Tags
 # =============================================================================
 
